@@ -10,6 +10,8 @@ gem "jekyll", "~> 4.3"
 # gem "github-pages", group: :jekyll_plugins
 
 # Jekyll plugins
+gem "kramdown"
+gem "rouge"
 gem "jekyll-feed"
 gem "jekyll-seo-tag"
 gem "jekyll-paginate" # Used for pagination based on your _config.yml

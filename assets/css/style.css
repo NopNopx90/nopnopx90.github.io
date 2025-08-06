@@ -1,3 +1,6 @@
+@import "monokai.css";
+@import "github.css";
+
 :root {
   /* FRANXX Theme (default) */
   --bg-primary: #0c0c14;
