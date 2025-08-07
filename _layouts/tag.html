@@ -1,0 +1,33 @@
+---
+layout: default
+---
+
+<h1 style="margin: 2.25rem">Posts tagged with #{{page.tag}}</h1>
+<ul>
+  <div class="posts-timeline">
+    {% for post in site.posts %} {% if post.tags contains page.tag %}
+    <div
+      class="timeline-item post-item"
+      data-category="{{ post.categories | first | downcase }}"
+    >
+      <div class="timeline-content post-content">
+        <h3 class="post-title">
+          <a href="{{ post.url }}">{{ post.title }}</a>
+        </h3>
+        <div class="timeline-date">
+          <span class="date">{{ post.date | date: "%B %d, %Y" }}</span>
+        </div>
+        <div class="post-meta">
+          {% if post.categories %}
+          <span class="tag">{{ post.categories | first }}</span>
+          {% endif %}
+          <span class="reading-time"
+            >{{ post.content | number_of_words | divided_by: 250 | plus: 1 }}
+            min read</span
+          >
+        </div>
+      </div>
+    </div>
+    {% endif %} {% endfor %}
+  </div>
+</ul>
