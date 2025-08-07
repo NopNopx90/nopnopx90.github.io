@@ -6,16 +6,12 @@ permalink: /archives
 
 <section class="archives">
   <div class="filters">
-    <h2>Filter by Category</h2>
+    <h2>Filter by Tags</h2>
     <div class="tag-list">
-      <span class="tag active" data-category="all">All</span>
-      <span class="tag" data-category="pwn">PWN</span>
-      <span class="tag" data-category="reverse">REVERSE</span>
-      <span class="tag" data-category="web">WEB</span>
-      <span class="tag" data-category="crypto">CRYPTO</span>
-      <span class="tag" data-category="kernel">KERNEL</span>
-      <span class="tag" data-category="gamepwn">GAMEPWN</span>
-      <span class="tag" data-category="ctf">CTF</span>
+      {% include collect_tags.html %}
+      {% for tag in tags %}
+        <a class="tag" href="{{ site.baseurl }}/tag/{{ tag }}">#{{ tag }}</a>
+      {% endfor %}
     </div>
   </div>
 
